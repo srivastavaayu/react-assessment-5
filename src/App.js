@@ -12,6 +12,11 @@ import IconTwitter from "./assets/icon-twitter.svg";
 import IconPinterest from "./assets/icon-pinterest.svg";
 import IconInstagram from "./assets/icon-instagram.svg";
 
+const OuterContainer = styled.div`
+  @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&display=swap");
+  font-family: "Poppins", sans-serif;
+`;
+
 const Container = styled.div`
   width: 85%;
   margin: 0 auto;
@@ -392,166 +397,177 @@ function copyToClipboard(data) {
 }
 
 function App() {
-  const callFetch = (url) => {
-    fetch(`https://api.shrtco.de/v2/shorten?url=${url}`)
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-        PreviousShortenedLinks.push({
-          original: data.result.full_short_link,
-          shortened: data.result.original_link,
-        });
-      });
-    console.log(PreviousShortenedLinks);
-  };
+  const [PreviousShortenedLinks, setPreviousShortenedLinks] = useState([]);
 
-  useEffect(() => {}, [PreviousShortenedLinks]);
+  const callFetch = async (url) => {
+    try {
+      const res = await fetch(`https://api.shrtco.de/v2/shorten?url=${url}`, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+        },
+      });
+      const data = await res.json();
+      console.log(data, PreviousShortenedLinks);
+      setPreviousShortenedLinks([
+        ...PreviousShortenedLinks,
+        {
+          original: data.result.original_link,
+          shortened: data.result.full_short_link,
+        },
+      ]);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   return (
     <div className="App">
       <ThemeProvider theme={theme}>
-        <Container>
-          <Navbar>
-            <NavbarLeft>
-              <NavbarBrandName>Shortly</NavbarBrandName>
-              <div>
-                <NavbarNavLink href="/">Features</NavbarNavLink>
-                <NavbarNavLink href="/">Pricing</NavbarNavLink>
-                <NavbarNavLink href="/">Resources</NavbarNavLink>
-              </div>
-            </NavbarLeft>
-            <NavbarRight>
-              <NavbarUnfilledButton as="a" href="/">
-                Login
-              </NavbarUnfilledButton>
-              <NavbarButton as="a" href="/">
-                Sign&nbsp;Up
-              </NavbarButton>
-            </NavbarRight>
-          </Navbar>
-        </Container>
-        <HeroContainer>
-          <HeroRight>
-            <img src={IllustrationWorking} />
-          </HeroRight>
-          <HeroLeft>
-            <HeroTitleText>More than just shorter links</HeroTitleText>
-            <HeroSubtitleText>
-              Build your brand's recognition and get detailed insights on how
-              your links are performing.
-            </HeroSubtitleText>
-            <HeroButton>Get Started</HeroButton>
-          </HeroLeft>
-        </HeroContainer>
-        <ShortenLinkOuterContainer>
-          <ShortenLinkContainer>
-            <ShortenLinkHiddenImage src={BgShortenDesktop} />
-            <ShortenLinkInnerContainer>
-              <ShortenLinkInputText
-                id="inputLink"
-                type="text"
-                placeholder="Shorten a link here..."
-              />
-              <ShortenLinkSubmitButton
-                onClick={() =>
-                  callFetch(document.getElementById("inputLink").value)
-                }
-              >
-                Shorten It!
-              </ShortenLinkSubmitButton>
-            </ShortenLinkInnerContainer>
-          </ShortenLinkContainer>
-        </ShortenLinkOuterContainer>
-        <ShortenLinkShortenedOuterContainer>
-          {PreviousShortenedLinks.length > 0 ? (
-            <ShortenLinkPreviousShortenedLinks>
-              {PreviousShortenedLinks.map(({ original, shortened }) => {
-                return (
-                  <ShortenLinkPreviousShortenedLink>
-                    <ShortenLinkPreviousShortenedLinkOriginal href={original}>
-                      {original}
-                    </ShortenLinkPreviousShortenedLinkOriginal>
-                    <div>
-                      <ShortenLinkPreviousShortenedLinkShortened
-                        href={shortened}
-                      >
-                        {shortened}
-                      </ShortenLinkPreviousShortenedLinkShortened>
-                      <ShortenLinkPreviousShortenedLinkButton
-                        onClick={() => copyToClipboard(shortened)}
-                      >
-                        Copy
-                      </ShortenLinkPreviousShortenedLinkButton>
-                    </div>
-                  </ShortenLinkPreviousShortenedLink>
-                );
-              })}
-            </ShortenLinkPreviousShortenedLinks>
-          ) : null}
-        </ShortenLinkShortenedOuterContainer>
-        <AdvancedStatisticsOuterContainer>
-          <AdvancedStatisticsContainer>
-            <AdvancedStatisticsTitleText>
-              Advanced Statistics
-            </AdvancedStatisticsTitleText>
-            <AdvancedStatisticsSubtitleText>
-              Track how your links are performing across the web with our
-              advanced statistics dashboard.
-            </AdvancedStatisticsSubtitleText>
-            <AdvancedStatisticsBoxContainer>
-              <AdvancedStatisticsBoxConnector />
-              {AdvancedStatistics.map(({ title, description, image }) => {
-                return (
-                  <AdvancedStatisticsBox>
-                    <AdvancedStatisticsBoxImageContainer>
-                      <img src={image} />
-                    </AdvancedStatisticsBoxImageContainer>
-                    <AdvancedStatisticsBoxTitleText>
-                      {title}
-                    </AdvancedStatisticsBoxTitleText>
-                    <AdvancedStatisticsBoxDescriptionText>
-                      {description}
-                    </AdvancedStatisticsBoxDescriptionText>
-                  </AdvancedStatisticsBox>
-                );
-              })}
-            </AdvancedStatisticsBoxContainer>
-          </AdvancedStatisticsContainer>
-        </AdvancedStatisticsOuterContainer>
-        <BoostLinksOuterContainer>
+        <OuterContainer>
           <Container>
-            <BoostLinksTitleText>Boost your links today</BoostLinksTitleText>
-            <BoostLinksButton>Get Started</BoostLinksButton>
+            <Navbar>
+              <NavbarLeft>
+                <NavbarBrandName>Shortly</NavbarBrandName>
+                <div>
+                  <NavbarNavLink href="/">Features</NavbarNavLink>
+                  <NavbarNavLink href="/">Pricing</NavbarNavLink>
+                  <NavbarNavLink href="/">Resources</NavbarNavLink>
+                </div>
+              </NavbarLeft>
+              <NavbarRight>
+                <NavbarUnfilledButton as="a" href="/">
+                  Login
+                </NavbarUnfilledButton>
+                <NavbarButton as="a" href="/">
+                  Sign&nbsp;Up
+                </NavbarButton>
+              </NavbarRight>
+            </Navbar>
           </Container>
-        </BoostLinksOuterContainer>
-        <FooterOuterContainer>
-          <FooterContainer>
-            <FooterLogo>
-              <FooterLogoTitle>Shortly</FooterLogoTitle>
-            </FooterLogo>
-            {FooterLists.map(({ group, items }) => {
-              return (
-                <FooterList>
-                  {group}
-                  <br />
-                  {items.map((item) => {
-                    return (
-                      <>
-                        <FooterListItem href="/">{item}</FooterListItem>
-                        <br />
-                      </>
-                    );
-                  })}
-                </FooterList>
-              );
-            })}
-            <FooterSocialLink>
-              {FooterSocialLinks.map(({ image }) => {
-                return <FooterSocialItem src={image} />;
+          <HeroContainer>
+            <HeroRight>
+              <img src={IllustrationWorking} />
+            </HeroRight>
+            <HeroLeft>
+              <HeroTitleText>More than just shorter links</HeroTitleText>
+              <HeroSubtitleText>
+                Build your brand's recognition and get detailed insights on how
+                your links are performing.
+              </HeroSubtitleText>
+              <HeroButton>Get Started</HeroButton>
+            </HeroLeft>
+          </HeroContainer>
+          <ShortenLinkOuterContainer>
+            <ShortenLinkContainer>
+              <ShortenLinkHiddenImage src={BgShortenDesktop} />
+              <ShortenLinkInnerContainer>
+                <ShortenLinkInputText
+                  id="inputLink"
+                  type="text"
+                  placeholder="Shorten a link here..."
+                />
+                <ShortenLinkSubmitButton
+                  onClick={() =>
+                    callFetch(document.getElementById("inputLink").value)
+                  }
+                >
+                  Shorten It!
+                </ShortenLinkSubmitButton>
+              </ShortenLinkInnerContainer>
+            </ShortenLinkContainer>
+          </ShortenLinkOuterContainer>
+          <ShortenLinkShortenedOuterContainer>
+            {PreviousShortenedLinks.length > 0 ? (
+              <ShortenLinkPreviousShortenedLinks>
+                {PreviousShortenedLinks.map(({ original, shortened }) => {
+                  return (
+                    <ShortenLinkPreviousShortenedLink>
+                      <ShortenLinkPreviousShortenedLinkOriginal href={original}>
+                        {original}
+                      </ShortenLinkPreviousShortenedLinkOriginal>
+                      <div>
+                        <ShortenLinkPreviousShortenedLinkShortened
+                          href={shortened}
+                        >
+                          {shortened}
+                        </ShortenLinkPreviousShortenedLinkShortened>
+                        <ShortenLinkPreviousShortenedLinkButton
+                          onClick={() => copyToClipboard(shortened)}
+                        >
+                          Copy
+                        </ShortenLinkPreviousShortenedLinkButton>
+                      </div>
+                    </ShortenLinkPreviousShortenedLink>
+                  );
+                })}
+              </ShortenLinkPreviousShortenedLinks>
+            ) : null}
+          </ShortenLinkShortenedOuterContainer>
+          <AdvancedStatisticsOuterContainer>
+            <AdvancedStatisticsContainer>
+              <AdvancedStatisticsTitleText>
+                Advanced Statistics
+              </AdvancedStatisticsTitleText>
+              <AdvancedStatisticsSubtitleText>
+                Track how your links are performing across the web with our
+                advanced statistics dashboard.
+              </AdvancedStatisticsSubtitleText>
+              <AdvancedStatisticsBoxContainer>
+                <AdvancedStatisticsBoxConnector />
+                {AdvancedStatistics.map(({ title, description, image }) => {
+                  return (
+                    <AdvancedStatisticsBox>
+                      <AdvancedStatisticsBoxImageContainer>
+                        <img src={image} />
+                      </AdvancedStatisticsBoxImageContainer>
+                      <AdvancedStatisticsBoxTitleText>
+                        {title}
+                      </AdvancedStatisticsBoxTitleText>
+                      <AdvancedStatisticsBoxDescriptionText>
+                        {description}
+                      </AdvancedStatisticsBoxDescriptionText>
+                    </AdvancedStatisticsBox>
+                  );
+                })}
+              </AdvancedStatisticsBoxContainer>
+            </AdvancedStatisticsContainer>
+          </AdvancedStatisticsOuterContainer>
+          <BoostLinksOuterContainer>
+            <Container>
+              <BoostLinksTitleText>Boost your links today</BoostLinksTitleText>
+              <BoostLinksButton>Get Started</BoostLinksButton>
+            </Container>
+          </BoostLinksOuterContainer>
+          <FooterOuterContainer>
+            <FooterContainer>
+              <FooterLogo>
+                <FooterLogoTitle>Shortly</FooterLogoTitle>
+              </FooterLogo>
+              {FooterLists.map(({ group, items }) => {
+                return (
+                  <FooterList>
+                    {group}
+                    <br />
+                    {items.map((item) => {
+                      return (
+                        <>
+                          <FooterListItem href="/">{item}</FooterListItem>
+                          <br />
+                        </>
+                      );
+                    })}
+                  </FooterList>
+                );
               })}
-            </FooterSocialLink>
-          </FooterContainer>
-        </FooterOuterContainer>
+              <FooterSocialLink>
+                {FooterSocialLinks.map(({ image }) => {
+                  return <FooterSocialItem src={image} />;
+                })}
+              </FooterSocialLink>
+            </FooterContainer>
+          </FooterOuterContainer>
+        </OuterContainer>
       </ThemeProvider>
     </div>
   );
